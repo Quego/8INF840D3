@@ -15,7 +15,7 @@ class Automaton
 {
 public:
 
-	Automaton<T>(int alphabetSize, int stateNumber, Node<T*> initialState, int finalStateNumber,
+	Automaton(int alphabetSize, int stateNumber, Node<T*> initialState, int finalStateNumber,
 		Node<T> finalStates[], int transitionsNumber);
 	
 	static Automaton<T> Parse(std::string filename);
@@ -41,8 +41,6 @@ private:
 	int m_transitionsNumber;
 
 };
-
-#endif
 
 template<typename T>
 inline Automaton<T> Automaton<T>::Parse(std::string filename)
@@ -104,3 +102,6 @@ template<typename T>
 inline Automaton<T>::Automaton(int alphabetSize, int stateNumber, Node<T*> initialState, int finalStateNumber, Node<T> finalStates[], int transitionsNumber)
 {
 }
+
+
+#endif
