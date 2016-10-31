@@ -4,21 +4,40 @@
 #include <vector>
 #include "Transition.h"
 
+/** \brief Representation of a Node. */
 template<typename T>
 class Node
 {
 public:
 
+	Node(int id, bool final);
+
+	void addTransition(Transition<T>* transition);
+
+	void addParent(Node<T>* parents);
+
+	int getId() const;
+	
+	bool isFinal() const;
+
+	std::vector<Node<T>*> getParents();
+
+	std::vector<Transition<T>*> getTransitions();
 
 private:
 	
-	int id;
+	/** The ID of the node.*/
+	int m_id;
 
-	bool isFinal;
+	/** Whether the node is a final state or note.*/
+	bool m_isFinal;
 
+	/** The parents of the node.*/
+	//TODO Usefull?
 	std::vector<Node<T>*> m_parents;
 
-	std::vector<Transition<T>> m_transitions;
+	/** The transitions of the ndoe.*/
+	std::vector<Transition<T>*> m_transitions;
 };
 
 
