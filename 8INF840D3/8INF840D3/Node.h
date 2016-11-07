@@ -2,7 +2,10 @@
 #define NODE_H
 
 #include <vector>
-#include "Transition.h"
+#include <string>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 /** \brief Representation of a Node. */
 template<typename T>
@@ -12,7 +15,6 @@ public:
 
 	Node(int id, bool final);
 
-	void addTransition(Transition<T>* transition);
 
 	void addParent(Node<T>* parents);
 
@@ -22,7 +24,7 @@ public:
 
 	std::vector<Node<T>*> getParents();
 
-	std::vector<Transition<T>*> getTransitions();
+
 
 private:
 	
@@ -36,10 +38,9 @@ private:
 	//TODO Usefull?
 	std::vector<Node<T>*> m_parents;
 
-	/** The transitions of the ndoe.*/
-	std::vector<Transition<T>*> m_transitions;
 };
+template<typename T>
+std::ostream& operator << (std::ostream& os, Node<T> const& node);
 
 
 #endif
-
