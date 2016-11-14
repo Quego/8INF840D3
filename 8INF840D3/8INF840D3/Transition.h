@@ -87,5 +87,4 @@ inline int Transition<T>::getWeight() const
 	return m_weight
 }
 
-
 #endif
