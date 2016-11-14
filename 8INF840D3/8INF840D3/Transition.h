@@ -55,6 +55,37 @@ private:
 
 };
 
+template <typename T>
+inline 	Transition<T>::Transition(Node<T>* current, Node<T>* destination, T value, int weight) :
+	m_current(current),
+	m_destination(destination),
+	m_value(value),
+	m_weight(weight)
+{}
+
+template <typename T>
+inline Node<T>* Transition<T>::getCurrent() const
+{
+	return m_current;
+}
+
+template <typename T>
+inline Node<T>* Transition<T>::getDestination() const
+{
+	return m_destination;
+}
+
+template <typename T>
+inline T Transition<T>::getValue() const
+{
+	return m_value;
+}
+
+template <typename T>
+inline int Transition<T>::getWeight() const
+{
+	return m_weight
+}
 
 
 #endif

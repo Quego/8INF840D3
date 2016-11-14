@@ -15,7 +15,6 @@ public:
 
 	Node(int id, bool final);
 
-
 	void addParent(Node<T>* parents);
 
 	int getId() const;
