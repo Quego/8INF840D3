@@ -46,6 +46,11 @@ public:
 	*/
 	void addTransition(Node<T>* destination, T value, int weight);
 
+	/** \brief Add a transition to the automaton
+	* \param transition The transition to add
+	*/
+	void addTransition(Transition<T>* transition);
+
 	/** \brief find the next Node with the wanted value on the transition.
 	* \param value The wanted value on the transition
 	* \return The next Node with the wanted value on the transition, nullptr if there is no node for this value
@@ -109,6 +114,12 @@ template<typename T>
 inline void Node<T>::addTransition(Node<T>* destination, T value, int weight)
 {
 	Transition<T>* transition = new Transition<T>(this, destination, value, weight);
+	m_transitions.push_back(transition);
+}
+
+template<typename T>
+inline void Node<T>::addTransition(Transition<T>* transition)
+{
 	m_transitions.push_back(transition);
 }
 

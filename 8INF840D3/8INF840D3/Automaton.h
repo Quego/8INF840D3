@@ -16,21 +16,47 @@ class Automaton
 {
 public:
 
+	/** \brief Constructor.*/
 	Automaton();
 
+	/** \brief Constructor.
+	* \param alphabetSize The size of the alphabet.
+	* \param stateNumber The number of states.
+	* \param initialState The initial state 
+	* \param finalStateNumber The number of final states.
+	* \param finalStates The final states.
+	* \param transitionsNumber The number of transitions.
+	*/
 	Automaton(int alphabetSize, int stateNumber, Node<T>* initialState, int finalStateNumber,
 		std::vector<Node<T>*> finalStates, int transitionsNumber);
 
+	/** \brief Parse a file into an Automaton
+	* \param filename The name of the file to parse
+	* \return An Automaton from a file.
+	*/
 	static Automaton<T> Parse(std::string filename);
 
+	/** \brief Add a transition to the automaton
+	* \param transition The transition to add
+	*/
 	void addTransition(Transition<T>* transition);
 
+	/** \brief transtions getter.
+	* \return The transitions of the automaton.
+	*/
 	std::vector<Transition<T>*> getTransitions();
 
+	/** \brief initialState getter.
+	* \return The inital state of the automaton.
+	*/
 	const Node<T>& getInitialState() const;
 
+	/** \brief finalState getter.
+	* \return The final states of the automaton.
+	*/
 	const std::vector<Node<T>*> getFinalStates() const;
 
+	/**  \brief operator override */
 	template <typename U> friend std::ostream& operator << (std::ostream& f, const Automaton<U>& q);
 
 private:
