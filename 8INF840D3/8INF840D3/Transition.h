@@ -1,8 +1,8 @@
 #ifndef TRANSITION_H
 #define TRANSITION_H
 
-#include <vector>
-#include "Node.cpp"
+template<typename T>
+class Node;
 
 /** \brief Representation of a Transition. */
 template<typename T>

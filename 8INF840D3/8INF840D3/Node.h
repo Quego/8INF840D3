@@ -2,13 +2,9 @@
 #define NODE_H
 
 #include <vector>
-#include <string>
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#include "Transition.h"
 
-template <typename T>
-class Transition;
+using namespace std;
 
 /** \brief Representation of a Node. */
 template<typename T>
@@ -43,6 +39,19 @@ public:
 	*/
 	Transition<T>* getTransitionAt(int index);
 
+	/** \brief Add a transition to the Node
+	* \param destination The destination node.
+	* \param value The value of the Transition.
+	* \param weight The weight of the Transition.
+	*/
+	void addTransition(Node<T>* destination, T value, int weight);
+
+	/** \brief find the next Node with the wanted value on the transition.
+	* \param value The wanted value on the transition
+	* \return The next Node with the wanted value on the transition, nullptr if there is no node for this value
+	*/
+	Node<T>* nodeOn(T value);
+
 private:
 	
 	/** The ID of the node.*/
@@ -57,18 +66,23 @@ private:
 };
 
 template<typename T>
-std::ostream& operator << (std::ostream& os, Node<T> const& node);
+std::ostream& operator << (std::ostream& os, Node<T> const& node)
+{
+	os << node.getId();
+	return os;
+}
+
 
 template<typename T>
 inline Node<T>::Node(int id, bool final) :
 	m_id(id),
 	m_final(final)
 {
-	m_transitions = std::vector<Transition<T>*> ();
+	m_transitions = std::vector<Transition<T>*>();
 }
 
 template<typename T>
-inline int Node<T>::getId() const 
+inline int Node<T>::getId() const
 {
 	return m_id;
 }
@@ -91,4 +105,21 @@ inline Transition<T>* Node<T>::getTransitionAt(int index)
 	return m_transitions.at(index);
 }
 
+template<typename T>
+inline void Node<T>::addTransition(Node<T>* destination, T value, int weight)
+{
+	Transition<T>* transition = new Transition<T>(this, destination, value, weight);
+	m_transitions.push_back(transition);
+}
+
+template<typename T>
+inline Node<T>* Node<T>::nodeOn(T value)
+{
+	for (unsigned int index = 0; index < m_transitions.size(); index++)
+	{
+		if (m_transitions.at(index)->getValue() == value)
+			return m_transitions.at(index)->getDestination();
+	}
+	return nullptr;
+}
 #endif

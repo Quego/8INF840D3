@@ -2,7 +2,8 @@
 #define Automaton_H
 
 #include "stdafx.cpp"
-#include "Transition.cpp"
+#include "Transition.h"
+#include "Node.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -214,6 +215,7 @@ inline std::vector<Transition<T>*> Automaton<T>::getTransitions()
 template<typename U>
 inline std::ostream & operator<<(std::ostream & f, const Automaton<U>& q)
 {
+
 	f << "Noeud Initial: " << q.getInitialState() << endl;
 	f << "Noeuds finau(x) : ";
 	for (Node<U>* finalNode : q.getFinalStates())
