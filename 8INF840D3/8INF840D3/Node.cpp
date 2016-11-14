@@ -10,6 +10,12 @@ Node<T>::Node(int id, bool final)
 	m_isFinal = final;
 }
 
+template<typename T>
+Node<T>::Node(const Node<T> &node)
+{
+	m_id = node.getId();
+	m_isFinal = node.isFinal();
+}
 
 template<typename T>
 void Node<T>::addParent(Node<T>* parents)
@@ -36,6 +42,14 @@ template<typename T>
 std::vector<Node<T>*> Node<T>::getParents()
 {
 	return m_parents;
+}
+
+template<typename T>
+bool Node<T>::operator==(const Node<T>& node)
+{
+	if (m_id == node.getId() && m_isFinal == node.isFinal())
+		return true;
+	return false;
 }
 
 template<typename T>

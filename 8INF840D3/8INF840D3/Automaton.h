@@ -3,6 +3,7 @@
 
 #include "stdafx.cpp"
 #include "Transition.cpp"
+#include <exception>      // std::exception
 #include <vector>
 #include <string>
 #include <iostream>
@@ -20,15 +21,17 @@ public:
 	Automaton(int alphabetSize, int stateNumber, Node<T>* initialState, int finalStateNumber,
 		std::vector<Node<T>*> finalStates, int transitionsNumber);
 
-	static Automaton<T> Parse(std::string filename);
+	static Automaton<T> Parse(std::string filename) throw(std::logic_error);
 
 	void addTransition(Transition<T>* transition);
 
-	std::vector<Transition<T>*> getTransitions();
+	int getAlphabetSize();
+
+	std::vector<Transition<T>*>& getTransitions();
 
 	const Node<T>& getInitialState() const;
 
-	const std::vector<Node<T>*> getFinalStates() const;
+	const std::vector<Node<T>*>& getFinalStates() const;
 
 	template <typename U> friend std::ostream& operator << (std::ostream& f, const Automaton<U>& q);
 
@@ -58,7 +61,7 @@ private:
 };
 
 template<typename T>
-inline Automaton<T> Automaton<T>::Parse(std::string filename)
+inline Automaton<T> Automaton<T>::Parse(std::string filename) throw(std::logic_error)
 {
 	std::ifstream file(filename, std::ios::in);
 
@@ -127,20 +130,20 @@ inline Automaton<T> Automaton<T>::Parse(std::string filename)
 
 			getline(file, content);
 			std::string transitionDetail = content.substr(0, content.find(" "));
-			int idNodeCurrent = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
-			transitionDetail = content.substr(0, content.find(" "));
 			T value = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
+			content.erase(0, transitionDetail.size()+1);
+			transitionDetail = content.substr(0, content.find(" "));
+			int idNodeCurrent = std::stoi(transitionDetail);
+			content.erase(0, transitionDetail.size()+1);
 			transitionDetail = content.substr(0, content.find(" "));
 			int idNodeDestination = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
+			content.erase(0, transitionDetail.size()+1);
 			transitionDetail = content.substr(0, content.find(" "));
 			int weight = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
+			content.erase(0, transitionDetail.size()+1);
 			
 			std::vector<Node <T>*>::iterator ite = statesInAutomaton.begin();
-
+			//On récupère les noeuds courants et destinataires via leurs id
 			while((nodeDestination == 0 || nodeCurrent == 0) && ite!= statesInAutomaton.end()){
 				if ((*ite)->getId() == idNodeCurrent) {
 					nodeCurrent = (*ite);
@@ -153,11 +156,13 @@ inline Automaton<T> Automaton<T>::Parse(std::string filename)
 			if (nodeCurrent != 0 && nodeDestination != 0)
 				parsedAutomaton.addTransition(new Transition<T>(nodeCurrent, nodeDestination, value, weight));
 		}
+		
 		return parsedAutomaton;
 
 	}
+	else 
+		throw std::logic_error("Parse : le fichier ne peut être lu");
 
-	return Automaton<T>();
 	// Taille de l'alphabet
 	// Nombre d'etats
 	// Noeud initial
@@ -165,23 +170,6 @@ inline Automaton<T> Automaton<T>::Parse(std::string filename)
 	// Les etats finaux 
 	// Nombre de transitions
 	// Les transitions
-}
-
-template<typename T>
-inline const Node<T>& Automaton<T>::getInitialState() const
-{
-	return *m_pinitialState;
-}
-
-template<typename T>
-inline const std::vector<Node<T>*> Automaton<T>::getFinalStates() const
-{
-	return m_finalStates;
-}
-
-template<typename T>
-inline Automaton<T>::Automaton()
-{
 }
 
 template<typename T>
@@ -195,6 +183,25 @@ inline Automaton<T>::Automaton(int alphabetSize, int stateNumber, Node<T>* initi
 	m_transitionsNumber = transitionsNumber;
 }
 
+template<typename T>
+inline const Node<T>& Automaton<T>::getInitialState() const
+{
+	return *m_pinitialState;
+}
+
+template<typename T>
+inline const std::vector<Node<T>*>& Automaton<T>::getFinalStates() const
+{
+	return m_finalStates;
+}
+
+template<typename T>
+inline Automaton<T>::Automaton()
+{
+}
+
+
+
 
 template<typename T>
 inline void Automaton<T>::addTransition(Transition<T>* transition)
@@ -205,7 +212,13 @@ inline void Automaton<T>::addTransition(Transition<T>* transition)
 }
 
 template<typename T>
-inline std::vector<Transition<T>*> Automaton<T>::getTransitions()
+inline int Automaton<T>::getAlphabetSize()
+{
+	return m_alphabetSize;
+}
+
+template<typename T>
+inline std::vector<Transition<T>*>& Automaton<T>::getTransitions()
 {
 	return m_transitions;
 }

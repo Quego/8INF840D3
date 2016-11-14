@@ -15,6 +15,8 @@ public:
 
 	Node(int id, bool final);
 
+	Node(const Node<T>& node);
+
 
 	void addParent(Node<T>* parents);
 
@@ -23,6 +25,9 @@ public:
 	bool isFinal() const;
 
 	std::vector<Node<T>*> getParents();
+
+	bool operator == (const Node<T>&);
+
 
 
 

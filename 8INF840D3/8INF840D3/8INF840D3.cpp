@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Automaton.h"
+#include "AutomatonPlus.cpp"
 
 using namespace std;
 
@@ -21,9 +21,11 @@ void help()
 
 //afficher à l'ecran les noeuds
 template <typename T>
-void displayGraphe(Automaton<T> myAutomaton) {
+void displayGraphe(AutomatonPlus<T> myAutomatonPlus) {
 
-	cout << myAutomaton;
+	cout << myAutomatonPlus;
+
+	
 }
 
 //ecrit les noeuds dans un fichier
@@ -56,11 +58,16 @@ int main()
 {
 
 	string transitionFile;
+	string constraintFile;
 	string commande;
 	cout << "\tPlus court chemin avec contraintes pour graphe par couche" << endl;
 	cout << "Entrez le nom du fichier contenant les transitions :" << endl;
 	cin >> transitionFile;
-	Automaton<int> myAutomaton = Automaton<int>::Parse(transitionFile);
+	cout << "Entrez le nom du fichier contenant les contraintes :" << endl;
+	//cin >> constraintFile;
+	Automaton<int> myAutomaton = Automaton<int>::Parse("test8.afdC"/*transitionFile*/);
+	AutomatonPlus<int> myAutomatonPlus = AutomatonPlus<int>::Parse(/*constraintFile*/"test8_limite.afdC", myAutomaton);
+
 	help();
 	while (commande != "quitter") {
 		
@@ -72,7 +79,7 @@ int main()
 		}
 		else if (commande == "graphe")
 		{
-			displayGraphe(myAutomaton);
+			displayGraphe(myAutomatonPlus);
 		}
 		else if (commande == "fichier")
 		{
