@@ -159,13 +159,6 @@ inline Automaton<T> Automaton<T>::Parse(std::string filename)
 	}
 
 	return Automaton<T>();
-	// Taille de l'alphabet
-	// Nombre d'etats
-	// Noeud initial
-	// Nombres des noeuds finaux
-	// Les etats finaux 
-	// Nombre de transitions
-	// Les transitions
 }
 
 template<typename T>
@@ -215,7 +208,6 @@ inline std::vector<Transition<T>*> Automaton<T>::getTransitions()
 template<typename U>
 inline std::ostream & operator<<(std::ostream & f, const Automaton<U>& q)
 {
-
 	f << "Noeud Initial: " << q.getInitialState() << endl;
 	f << "Noeuds finau(x) : ";
 	for (Node<U>* finalNode : q.getFinalStates())
