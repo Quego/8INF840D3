@@ -1,5 +1,5 @@
-#ifndef Automaton_H
-#define Automaton_H
+#ifndef AUTOMATON_H
+#define AUTOMATON_H
 
 #include "stdafx.cpp"
 #include "Transition.h"
@@ -84,6 +84,14 @@ private:
 
 };
 
+//4 taille alphabet
+//4  nombre d'état
+//1  noeud initial
+//4  le nombre des états finaux
+//1 2 3 4 les états finaux
+//10	nombre de transitions
+//1 1 2 4  on va de 1 à 2 de coût 4 et en lisant la lettre 1
+//1 2 2 3  on va de 2 à 2 de coût 3 et en lisant la lettre 1
 template<typename T>
 inline Automaton<T> Automaton<T>::Parse(std::string filename)
 {
