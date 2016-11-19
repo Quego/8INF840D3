@@ -33,10 +33,13 @@
     <ClInclude Include="Transition.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="AutomatonPlus.h">
+    <ClInclude Include="LayeredGraph.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="Constraint.h">
+    <ClInclude Include="Limit.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="Occurrence.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,19 +50,15 @@
     <ClCompile Include="8INF840D3.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Node.cpp">
+    <ClCompile Include="Occurrence.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Transition.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="AutomatonPlus.cpp">
+    <ClCompile Include="Limit.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="test8.afdC" />
     <None Include="test10.afdC" />
-    <None Include="test8_limite.afdC" />
   </ItemGroup>
 </Project>
