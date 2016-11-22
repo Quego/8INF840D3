@@ -42,6 +42,9 @@
     <ClInclude Include="Occurrence.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="SmallPath.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -60,5 +63,11 @@
   <ItemGroup>
     <None Include="test8.afdC" />
     <None Include="test10.afdC" />
+    <None Include="test8_limite.afdC" />
+    <None Include="test11.afdC" />
+    <None Include="test11limite.afdC" />
+    <None Include="test23.afdC" />
+    <None Include="test23_limite.afdC" />
+    <None Include="test10_limite.afdC" />
   </ItemGroup>
 </Project>

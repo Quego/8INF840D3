@@ -27,7 +27,7 @@ public:
 	* \param finalStates The final states.
 	* \param transitionsNumber The number of transitions.
 	*/
-	Automaton(int alphabetSize, int stateNumber, Node<T>* initialState, int finalStateNumber,
+	Automaton(int alphabetSize, int stateNumber, std::vector<Node<T>*> states, Node<T>* initialState, int finalStateNumber,
 		std::vector<Node<T>*> finalStates, int transitionsNumber);
 
 	/** \brief Parse a file into an Automaton
@@ -45,6 +45,11 @@ public:
 	* \return The transitions of the automaton.
 	*/
 	std::vector<Transition<T>*> getTransitions();
+
+	/** \brief states getter.
+	* \return The states of the automaton.
+	*/
+	const std::vector<Node<T>*> getStates() const;
 
 	/** \brief initialState getter.
 	* \return The inital state of the automaton.
@@ -67,19 +72,22 @@ private:
 	/** \brief The number of states. */
 	int m_stateNumber;
 
-	/** \brief The initial state .*/
+	/** \brief All the states from the automaton. */
+	std::vector<Node<T>*> m_states;
+
+	/** \brief The initial state. */
 	Node<T>* m_pinitialState;
 
 	/** \brief The number of final states. */
 	int m_finalStateNumber;
 
-	/** \brief The final states.*/
+	/** \brief The final states. */
 	std::vector<Node<T>*> m_finalStates;
 
 	/** \brief The number of transitions. */
 	int m_transitionsNumber;
 
-	/** The transitions of the node.*/
+	/** The transitions of the node. */
 	std::vector<Transition<T>*> m_transitions;
 
 };
@@ -152,7 +160,7 @@ inline Automaton<T> Automaton<T>::Parse(std::string filename)
 
 		Node<T>* initialNode = statesInAutomaton.at(initialStateId - 1);
 
-		Automaton<T> parsedAutomaton(alphabetSize, stateNumber, initialNode, finalStateNumber, finalStates, transitionsNumber);
+		Automaton<T> parsedAutomaton(alphabetSize, stateNumber, statesInAutomaton, initialNode, finalStateNumber, finalStates, transitionsNumber);
 
 		//Creation of Transitions
 		for (int cptTransition = 0; cptTransition < transitionsNumber; ++cptTransition)
@@ -162,17 +170,17 @@ inline Automaton<T> Automaton<T>::Parse(std::string filename)
 
 			getline(file, content);
 			std::string transitionDetail = content.substr(0, content.find(" "));
-			int idNodeCurrent = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
-			transitionDetail = content.substr(0, content.find(" "));
 			T value = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
+			content.erase(0, transitionDetail.size()+1);
+			transitionDetail = content.substr(0, content.find(" "));
+			int idNodeCurrent = std::stoi(transitionDetail);
+			content.erase(0, transitionDetail.size()+1);
 			transitionDetail = content.substr(0, content.find(" "));
 			int idNodeDestination = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
+			content.erase(0, transitionDetail.size()+1);
 			transitionDetail = content.substr(0, content.find(" "));
 			int weight = std::stoi(transitionDetail);
-			content.erase(0, transitionDetail.size()-1);
+			content.erase(0, transitionDetail.size()+1);
 			
 			std::vector<Node <T>*>::iterator ite = statesInAutomaton.begin();
 
@@ -186,7 +194,8 @@ inline Automaton<T> Automaton<T>::Parse(std::string filename)
 				++ite;
 			}
 			if (nodeCurrent != 0 && nodeDestination != 0)
-				parsedAutomaton.addTransition(new Transition<T>(nodeCurrent, nodeDestination, value, weight));
+				nodeCurrent->addTransition(nodeDestination, value, weight);
+				parsedAutomaton.addTransition(nodeCurrent->getTransitions().back());
 		}
 		return parsedAutomaton;
 
@@ -213,10 +222,11 @@ inline Automaton<T>::Automaton()
 }
 
 template<typename T>
-inline Automaton<T>::Automaton(int alphabetSize, int stateNumber, Node<T>* initialState, int finalStateNumber, std::vector<Node<T>*> finalStates, int transitionsNumber)
+inline Automaton<T>::Automaton(int alphabetSize, int stateNumber, std::vector<Node<T>*> states, Node<T>* initialState, int finalStateNumber, std::vector<Node<T>*> finalStates, int transitionsNumber)
 {
 	m_alphabetSize = alphabetSize;
 	m_stateNumber = stateNumber;
+	m_states = states;
 	m_pinitialState = initialState;
 	m_finalStateNumber = finalStateNumber;
 	m_finalStates = finalStates;
@@ -238,11 +248,20 @@ inline std::vector<Transition<T>*> Automaton<T>::getTransitions()
 	return m_transitions;
 }
 
+template<typename T>
+inline const std::vector<Node<T>*> Automaton<T>::getStates() const
+{
+	return m_states;
+}
+
 
 template<typename U>
 inline std::ostream & operator<<(std::ostream & f, const Automaton<U>& q)
 {
-	f << "Noeud Initial: " << q.getInitialState() << endl;
+	f << "Noeuds: ";
+	for (Node<U>* node : q.getStates())
+		f << *node << " |";
+	f << "\nNoeud Initial: " << q.getInitialState() << endl;
 	f << "Noeuds finau(x) : ";
 	for (Node<U>* finalNode : q.getFinalStates())
 		f << *finalNode << " |";

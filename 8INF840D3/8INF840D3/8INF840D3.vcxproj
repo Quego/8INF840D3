@@ -146,6 +146,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Automaton.h" />
+    <ClInclude Include="SmallPath.h" />
     <ClInclude Include="LayeredGraph.h" />
     <ClInclude Include="Limit.h" />
     <ClInclude Include="Node.h" />
@@ -167,7 +168,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="test10.afdC" />
+    <None Include="test10_limite.afdC" />
+    <None Include="test11.afdC" />
+    <None Include="test11limite.afdC" />
+    <None Include="test23.afdC" />
+    <None Include="test23_limite.afdC" />
     <None Include="test8.afdC" />
+    <None Include="test8_limite.afdC" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

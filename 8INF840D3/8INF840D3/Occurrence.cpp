@@ -20,3 +20,13 @@ int Occurrence::getMax() const
 {
 	return m_max;
 }
+
+void Occurrence::setMin(int min)
+{
+	m_min = min;
+}
+
+void Occurrence::setMax(int max)
+{
+	m_max = max;
+}

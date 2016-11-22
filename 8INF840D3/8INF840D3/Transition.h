@@ -1,6 +1,8 @@
 #ifndef TRANSITION_H
 #define TRANSITION_H
 
+#include <ostream>
+
 template<typename T>
 class Node;
 
@@ -37,6 +39,9 @@ public:
 	* \return The value.
 	*/
 	T getValue() const;
+
+	/**  \brief operator override */
+	template <typename U> friend std::ostream& operator << (std::ostream& f, const Transition<U>& q);
 
 private:
 
@@ -84,7 +89,14 @@ inline T Transition<T>::getValue() const
 template <typename T>
 inline int Transition<T>::getWeight() const
 {
-	return m_weight
+	return m_weight;
+}
+
+template<typename U>
+inline std::ostream & operator<<(std::ostream & f, const Transition<U>& q)
+{
+	f << "[Noeud Courant, Noeud Destinataire, Lettre, Poids] : " <<"[" << *q.getCurrent() << ", " << *q.getDestination() << ", " << q.getValue() << ", " << q.getWeight() << "]" << endl;
+	return f;
 }
 
 #endif

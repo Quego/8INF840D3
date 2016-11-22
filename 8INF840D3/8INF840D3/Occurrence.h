@@ -25,6 +25,16 @@ public:
 	*/
 	int getMax() const;
 
+	/** \brief min setter.
+	* \param min : the minimum occurrence of letter
+	*/
+	void setMin(int min);
+
+	/** \brief max setter.
+	* \param max : the maximum occurrence of letter
+	*/
+	void setMax(int max);
+
 private:
 	//1 1 1 1 liste des valeurs minimales - Une lettre doit se trouver au moins une fois sur le chemin le plus court
 	//2 2 2 2 liste des valeurs maximales - Une lettre doit se trouver au maximum 2 fois sur le chemin le plus court

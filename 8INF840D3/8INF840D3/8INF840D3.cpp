@@ -2,7 +2,9 @@
 //
 
 #include "stdafx.h"
-#include "AutomatonPlus.cpp"
+#include "Automaton.h"
+#include "Limit.h"
+#include "SmallPath.h"
 
 using namespace std;
 
@@ -12,7 +14,7 @@ void help()
 	cout << "- help, ? : affiche la liste des commandes" << endl;
 	cout << "- graphe : afficher à l'ecran les noeuds" << endl;
 	cout << "- fichier : ecrit les noeuds dans un fichier" << endl;
-	cout << "- plus court chemin : calculer le plus court chemin" << endl;
+	cout << "- pcc : calculer le plus court chemin" << endl;
 	cout << "- afficher : afficher les plus courts chemins" << endl;
 	cout << "- ecrire : ecrire dans un fichier" << endl;
 	cout << "- recherche : recherche arrete" << endl;
@@ -21,9 +23,9 @@ void help()
 
 //afficher à l'ecran les noeuds
 template <typename T>
-void displayGraphe(AutomatonPlus<T> myAutomatonPlus) {
+void displayGraphe(Automaton<T> myAutomaton) {
 
-	cout << myAutomatonPlus;
+	cout << myAutomaton;
 
 	
 }
@@ -34,13 +36,48 @@ void fichier() {
 }
 
 //calculer le plus court chemin
-void pcc() {
-
+template <typename T>
+void pcc(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
+		std::string word;
+		cout << "Entrez un mot de taille " << limite.getWordSize() << " : ";
+		cin >> word;
+		bool isAlphabetValide = true;
+		for (char letter : word) {
+			if (letter - '0' > limite.getAlphabetSize()) {
+				isAlphabetValide = false;
+			}
+		}
+		if (limite.getWordSize() == word.size() && isAlphabetValide) {
+			smPath.calculateDijkstra(limite, word);
+		}
+		else {
+			cout << "le mot entre ne correspond pas aux contraintes imposees" << endl;
+		}
+	//}
+	
 }
 
-// afficher les plus courts chemins
-void display() {
 
+
+// afficher les plus courts chemins
+template <typename T>
+void display(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
+	std::string word;
+	cout << "Entrez un mot de taille " << limite.getWordSize() << " : ";
+	cin >> word;
+	bool isAlphabetValide = true;
+	for (char letter : word) {
+		if (letter - '0' > limite.getAlphabetSize()) {
+			isAlphabetValide = false;
+		}
+	}
+	if (limite.getWordSize() == word.size() && isAlphabetValide) {
+		smPath.calculateDijkstra(limite, word);
+		smPath.display(word);
+	}
+	else {
+		cout << "le mot entre ne correspond pas aux contraintes imposees" << endl;
+	}
 }
 
 //ecrire dans un fichier
@@ -65,9 +102,9 @@ int main()
 	cin >> transitionFile;
 	cout << "Entrez le nom du fichier contenant les contraintes :" << endl;
 	//cin >> constraintFile;
-	Automaton<int> myAutomaton = Automaton<int>::Parse("test8.afdC"/*transitionFile*/);
-	AutomatonPlus<int> myAutomatonPlus = AutomatonPlus<int>::Parse(/*constraintFile*/"test8_limite.afdC", myAutomaton);
-
+	Automaton<int> myAutomaton = Automaton<int>::Parse("test11.afdC"/*transitionFile*/);
+	Limit limite = Limit::Parse(/*constraintFile*/"test11limite.afdC");
+	SmallPath<int> smPath(myAutomaton);
 	help();
 	while (commande != "quitter") {
 		
@@ -79,17 +116,17 @@ int main()
 		}
 		else if (commande == "graphe")
 		{
-			displayGraphe(myAutomatonPlus);
+			displayGraphe(myAutomaton);
 		}
 		else if (commande == "fichier")
 		{
 			fichier();
 		}
-		else if (commande == "plus court chemin") {
-			pcc();
+		else if (commande == "pcc") {
+			pcc(myAutomaton, limite, smPath);
 		}
 		else if (commande == "afficher") {
-			display();
+			display(myAutomaton, limite, smPath);
 		}
 		else if (commande == "ecrire") {
 			write();
