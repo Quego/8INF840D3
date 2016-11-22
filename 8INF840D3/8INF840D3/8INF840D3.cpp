@@ -39,7 +39,7 @@ void fichier() {
 template <typename T>
 void pcc(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 		std::string word;
-		cout << "Entrez un mot de taille " << limite.getWordSize() << " : ";
+		cout << "Entrez un mot de taille " << limite.getWordSize() << " et dont l'alphabet ne depasse pas "<< limite.getAlphabetSize() << " : ";
 		cin >> word;
 		bool isAlphabetValide = true;
 		for (char letter : word) {
@@ -63,7 +63,7 @@ void pcc(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 template <typename T>
 void display(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 	std::string word;
-	cout << "Entrez un mot de taille " << limite.getWordSize() << " : ";
+	cout << "Entrez un mot de taille " << limite.getWordSize() << " et dont l'alphabet ne depasse pas " << limite.getAlphabetSize() << " : ";
 	cin >> word;
 	bool isAlphabetValide = true;
 	for (char letter : word) {
