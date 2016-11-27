@@ -21,7 +21,7 @@ int Limit::getWordSize() const
 	return m_wordSize;
 }
 
-std::vector<Occurrence> Limit::getOccurences() const
+std::vector<Occurrence> Limit::getOccurrences() const
 {
 	return m_occurrences;
 }

@@ -13,10 +13,8 @@ void help()
 	cout << "----------Les commandes possibles sont les suivantes ----------" << endl;
 	cout << "- help, ? : affiche la liste des commandes" << endl;
 	cout << "- graphe : afficher à l'ecran les noeuds" << endl;
-	cout << "- fichier : ecrit les noeuds dans un fichier" << endl;
 	cout << "- pcc : calculer le plus court chemin" << endl;
 	cout << "- afficher : afficher les plus courts chemins" << endl;
-	cout << "- ecrire : ecrire dans un fichier" << endl;
 	cout << "- recherche : recherche arrete" << endl;
 	cout << "- quitter : quitter le programme" << endl;
 }
@@ -30,11 +28,6 @@ void displayGraphe(Automaton<T> myAutomaton) {
 	
 }
 
-//ecrit les noeuds dans un fichier
-void fichier() {
-
-}
-
 //calculer le plus court chemin
 template <typename T>
 void pcc(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
@@ -42,18 +35,32 @@ void pcc(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 		cout << "Entrez un mot de taille " << limite.getWordSize() << " et dont l'alphabet ne depasse pas "<< limite.getAlphabetSize() << " : ";
 		cin >> word;
 		bool isAlphabetValide = true;
+		std::vector<Occurrence> occurrences = limite.getOccurrences();
 		for (char letter : word) {
 			if (letter - '0' > limite.getAlphabetSize()) {
 				isAlphabetValide = false;
+				break;
+			}
+			else {
+				occurrences[letter - '0' - 1].setMin(occurrences[letter - '0' - 1].getMin()-1);
+				occurrences[letter - '0' - 1].setMax(occurrences[letter - '0' - 1].getMax()-1);
 			}
 		}
 		if (limite.getWordSize() == word.size() && isAlphabetValide) {
-			smPath.calculateDijkstra(limite, word);
+			for (int layer = 0; layer < limite.getAlphabetSize(); ++layer) {
+				if (occurrences[layer].getMin() > 0 || occurrences[layer].getMax() < 0) {
+					isAlphabetValide = false;
+					cout << "le nombre d'occurences de la lettre : " << layer+1 << " ne correspond pas aux limites attendues" << endl;
+					break;
+				}
+			}
+			if (isAlphabetValide) {
+				smPath.calculateDijkstra(/*limite,*/ word);
+			}
 		}
 		else {
 			cout << "le mot entre ne correspond pas aux contraintes imposees" << endl;
 		}
-	//}
 	
 }
 
@@ -66,24 +73,35 @@ void display(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 	cout << "Entrez un mot de taille " << limite.getWordSize() << " et dont l'alphabet ne depasse pas " << limite.getAlphabetSize() << " : ";
 	cin >> word;
 	bool isAlphabetValide = true;
+	std::vector<Occurrence> occurrences = limite.getOccurrences();
 	for (char letter : word) {
 		if (letter - '0' > limite.getAlphabetSize()) {
 			isAlphabetValide = false;
+			break;
+		}
+		else {
+			occurrences[letter - '0' - 1].setMin(occurrences[letter - '0' - 1].getMin() - 1);
+			occurrences[letter - '0' - 1].setMax(occurrences[letter - '0' - 1].getMax() - 1);
 		}
 	}
 	if (limite.getWordSize() == word.size() && isAlphabetValide) {
-		smPath.calculateDijkstra(limite, word);
-		smPath.display(word);
+		for (int layer = 0; layer < limite.getAlphabetSize(); ++layer) {
+			if (occurrences[layer].getMin() > 0 || occurrences[layer].getMax() < 0) {
+				isAlphabetValide = false;
+				cout << "le nombre d'occurences de la lettre : " << layer + 1 << " ne correspond pas aux limites attendues" << endl;
+				break;
+			}
+		}
+		if (isAlphabetValide) {
+			smPath.calculateDijkstra(/*limite,*/ word);
+			smPath.display(word);
+		}
 	}
 	else {
 		cout << "le mot entre ne correspond pas aux contraintes imposees" << endl;
 	}
 }
 
-//ecrire dans un fichier
-void write() {
-
-}
 
 //recherche arrete
 void search() {
@@ -119,18 +137,11 @@ int main()
 		{
 			displayGraphe(myAutomaton);
 		}
-		else if (commande == "fichier")
-		{
-			fichier();
-		}
 		else if (commande == "pcc") {
 			pcc(myAutomaton, limite, smPath);
 		}
 		else if (commande == "afficher") {
-			//display(myAutomaton, limite, smPath);
-		}
-		else if (commande == "ecrire") {
-			write();
+			display(myAutomaton, limite, smPath);
 		}
 		else if (commande == "recherche") {
 			search();

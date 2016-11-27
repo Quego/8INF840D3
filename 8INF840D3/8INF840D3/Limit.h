@@ -31,7 +31,7 @@ public:
 	/** \brief The occurence of each letter getter.
 	* \return The occurence of each letter.
 	*/
-	std::vector<Occurrence> getOccurences() const;
+	std::vector<Occurrence> getOccurrences() const;
 
 	/** \brief The occurence of one letter getter.
 	* \return The occurence of one letter
