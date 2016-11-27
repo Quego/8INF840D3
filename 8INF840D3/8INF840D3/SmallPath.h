@@ -3,7 +3,7 @@
 #define SMALLPATH_H
 
 #include "stdafx.cpp"
-#include "Automaton.h"
+#include "LayeredGraph.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -21,7 +21,7 @@ public:
 	/** \brief Constructor.
 	* \param automaton the graph to calculate
 	*/
-	SmallPath(Automaton<T> automaton);
+	SmallPath(Automaton<T> automaton, LayeredGraph<T> layeredGraph);
 
 	void calculateDijkstra(Limit limite, std::string word);
 
@@ -43,14 +43,17 @@ private:
 	*	- the index position of the word.
 	*/
 	std::vector <std::tuple< Node<T>*, int, int>> m_tripleNodeWeightPositionWord;
+	LayeredGraph<T> m_layeredGraph;
+
 };
 
 #endif // !SMALLPATH_H
 
 template<typename T>
-inline SmallPath<T>::SmallPath(Automaton<T> automaton)
+inline SmallPath<T>::SmallPath(Automaton<T> automaton, LayeredGraph<T> layeredGraph)
 {
-	m_automaton = automaton;	
+	m_automaton = automaton;
+	m_layeredGraph = layeredGraph;
 }
 
 /**
@@ -62,45 +65,63 @@ inline void SmallPath<T>::calculateDijkstra(Limit limite, std::string word)
 	//Algorithme Dijkstra
 	//initialisation
 	//TODO : Rajouter conditions par rapport aux min Occurences 
-	for (unsigned int i = 0; i < m_automaton.getStates().size(); ++i) {
-		// Représente l'arbre par couche, non parfait, faire une double liste chainée
-		m_tripleNodeWeightPositionWord.push_back(std::make_tuple((Node<T>*) NULL, INT_MAX, 0));
-	}
+	m_layeredGraph.init();
 	int position = m_automaton.getInitialState().getId() - 1;
-	m_tripleNodeWeightPositionWord.at(position) = std::make_tuple((Node<T>*) NULL, 0, 0);
+	//m_tripleNodeWeightPositionWord.at(position) = std::make_tuple((Node<T>*) NULL, 0, 0);
+	std::vector<std::vector<std::pair<Node<T>*, int>>> paireNodeWeight = m_layeredGraph.getLayers();
 	std::vector<Node<T>*> V = m_automaton.getStates();
 	std::vector<Node<T>*> S;
-	std::vector<Node<T>*> fileNodes;
+	std::vector<std::pair<Node<T>*,int>> fileNodes;
 	std::vector<Transition<T>*> transitions = m_automaton.getTransitions();
 	std::vector<Occurrence> occurrences = limite.getOccurences();
-	fileNodes.push_back(m_automaton.getStates().at(position));
+	fileNodes.push_back(make_pair(m_automaton.getStates().at(position),0));
 
 	while (!fileNodes.empty()) {
 		//Traitement d'un noeud
-		int positionWord;
-		position = fileNodes.front()->getId()-1;
+		std::pair < Node<T>*, int> nodeToRemove;
+		int positionWord=0;
+		position = fileNodes.front().first->getId();
 		int minWeight = INT_MAX;
-		for(Node<T>* node : fileNodes){
-			std::tuple<Node<T>*, int, int > tupleToFind = m_tripleNodeWeightPositionWord.at(node->getId() - 1);
-			if (std::get<1>(tupleToFind) < minWeight) {
-				position = node->getId() - 1;
-				minWeight = std::get<1>(tupleToFind);
-				positionWord = std::get<2>(tupleToFind);
+		for(std::pair<Node<T>*, int> node : fileNodes){
+			//std::tuple<Node<T>*, int, int > tupleToFind = m_tripleNodeWeightPositionWord.at(node->getId() - 1);
+			std::vector<std::pair<Node<T>*, int>> paireToFind = m_layeredGraph.getLayer(node.second);
+			std::cout << " Poids : " << paireToFind.at(node.first->getId() - 1).second  << std::endl;
+			if (paireToFind.at(node.first->getId()-1).second <= minWeight) {
+				position = node.first->getId() - 1;
+				minWeight = paireToFind.at(node.first->getId()-1).second;
+				positionWord = node.second;
+				std::cout << " Position de la lettre : " << node.second << std::endl;
+
+				nodeToRemove = node;
+				
 			}
 		}
 		Node<T>* currentNode = V.at(position);
-		auto it = std::find(fileNodes.begin(), fileNodes.end(), currentNode);
+		std::cout << " NoeudTraité : " << *currentNode << std::endl;
+
+
+		auto it = std::find(fileNodes.begin(), fileNodes.end(), nodeToRemove);
 		if (it != fileNodes.end()) {
+			//fileNodes.erase(remove_if(fileNodes.begin(), fileNodes.end(), [](pair<string, string> pair) { return pair.second == "ore"; }));
+
 			fileNodes.erase(it);
 			S.push_back(currentNode);
 		}
+		std::cout << "Taille : " << fileNodes.size() << std::endl;
 
 		//Verification des transitions
 		for (unsigned int index = 0; index < currentNode->getTransitions().size(); ++index) {
+			std::cout << "test 1" << std::endl;
+
 			Transition<T>* transition = currentNode->getTransitionAt(index);
+
 			if (transition->getValue() == word.at(positionWord)-'0') {
+				std::cout << "test 2" << std::endl;
+
 				bool isfinal = false;
-				if (positionWord + 1 == word.size() - 1) {
+				if (positionWord + 1 == word.size()) {
+					std::cout << "test 3" << std::endl;
+
 					//Le noeud à la position n pour un mot de taille n+1 doit être final
 					auto finalStates = m_automaton.getFinalStates();
 					for (auto ite = std::begin(finalStates); ite != std::end(finalStates); ++ite) {
@@ -109,12 +130,19 @@ inline void SmallPath<T>::calculateDijkstra(Limit limite, std::string word)
 							break;
 						}
 					}
+					std::cout << "test 4" << std::endl;
+
 				}
-				if (positionWord + 1 < word.size()-1 || isfinal ) {					
+				std::cout << "test 5" << std::endl;
+
+				if (positionWord + 1 < word.size() || isfinal ) {					
 					int currentMaxOccurence = occurrences.at(transition->getValue() - 1).getMax();
 					if (currentMaxOccurence > 0) {
-						relax(currentNode, transition->getDestination(), transition->getWeight(), positionWord + 1);
-						fileNodes.push_back(transition->getDestination());
+						relax(currentNode, transition->getDestination(), transition->getWeight(), positionWord+1);
+						std::cout << "Valeur Calculee : " << m_layeredGraph.getLayer(positionWord+1).at(transition->getDestination()->getId() - 1).second << std::endl;
+						if (!isfinal) {
+							fileNodes.push_back(make_pair(transition->getDestination(), positionWord + 1));
+						}
 						occurrences.at(transition->getValue() - 1).setMax(currentMaxOccurence - 1);
 					}
 				}
@@ -122,17 +150,18 @@ inline void SmallPath<T>::calculateDijkstra(Limit limite, std::string word)
 			}
 		}
 	}
+	std::cout << "ON SORT!" << std::endl;
 	// calcul du plus court chemin selon le résultat du noeud final
 	int max = INT_MAX;
 	bool isFind = false;
 
 	for (Node<T>* finalNode : m_automaton.getFinalStates()) {
-		std::tuple<Node<T>*, int, int > tuple = m_tripleNodeWeightPositionWord.at(finalNode->getId()-1);
-		if (std::get<0>(tuple) != 0) {
-			cout << "Noeud : " << *std::get<0>(tuple) << ", Poids : " << std::get<1>(tuple) << ", Position du mot : " << std::get<2>(tuple) <<  endl;
+		std::pair<Node<T>*, int> paire = m_layeredGraph.getLayer(word.size()).at(finalNode->getId() - 1);
+		if (paire.first != 0) {
+			cout << "Noeud : " << *paire.first << ", Poids : " << paire.second << ", Position du mot : " << word.size() <<  endl;
 		}
-		if (std::get<0>(tuple) != 0 && std::get<1>(tuple) < max && std::get<2>(tuple)==word.size()-1) {
-			max = std::get<1>(tuple);
+		if (paire.first != 0 && paire.second < max) {
+			max = paire.second;
 			isFind = true;
 		}
 	}
@@ -148,11 +177,22 @@ inline void SmallPath<T>::calculateDijkstra(Limit limite, std::string word)
 template <typename T>
 inline void SmallPath<T>::relax(Node<T>* currentNode, Node<T>* destinationNode, int weightTransition, int positionWord)
 {
-	std::tuple<Node<T>*, int, int > tupleToFind = m_tripleNodeWeightPositionWord.at(destinationNode->getId() - 1);
-	std::tuple<Node<T>*, int, int > tupleCurrent = m_tripleNodeWeightPositionWord.at(currentNode->getId() - 1);
-	if (std::get<1>(tupleToFind) > std::get<1>(tupleCurrent) + weightTransition || std::get<2>(tupleToFind)<positionWord) {
-		m_tripleNodeWeightPositionWord.at(destinationNode->getId() - 1) = std::make_tuple(currentNode, std::get<1>(tupleCurrent) + weightTransition, positionWord);
-		std::tuple<Node<T>*, int, int > tupleToFind = m_tripleNodeWeightPositionWord.at(destinationNode->getId() - 1);
+	std::pair<Node<T>*, int> paireToFind = m_layeredGraph.getLayer(positionWord).at(destinationNode->getId() - 1);
+	std::pair<Node<T>*, int> paireCurrent = m_layeredGraph.getLayer(positionWord - 1).at(currentNode->getId() - 1);
+	//std::tuple<Node<T>*, int, int > tupleToFind = m_tripleNodeWeightPositionWord.at(destinationNode->getId() - 1);
+	//std::tuple<Node<T>*, int, int > tupleCurrent = m_tripleNodeWeightPositionWord.at(currentNode->getId() - 1);
+	std::cout << "Test IMPORTANT : "<< (paireToFind.second > paireCurrent.second + weightTransition) << std::endl;
+	if (paireToFind.second > paireCurrent.second + weightTransition) {
+
+		m_layeredGraph.setWeight(positionWord, paireToFind.first->getId()-1, paireCurrent.second + weightTransition);
+
+		//m_tripleNodeWeightPositionWord.at(destinationNode->getId() - 1) = std::make_tuple(currentNode, std::get<1>(tupleCurrent) + weightTransition, positionWord);
+		//std::tuple<Node<T>*, int, int > tupleToFind = m_tripleNodeWeightPositionWord.at(destinationNode->getId() - 1);
+	}
+	else {
+		std::cout << "POURQUOI : " << "Poids Actuel : " << paireToFind.second << std::endl;
+		std::cout << "Poids Courant + Transition : " << paireCurrent.second <<" , "<<  weightTransition << std::endl;
+
 	}
 }
 

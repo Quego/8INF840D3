@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "Automaton.h"
+#include "LayeredGraph.h"
 #include "Limit.h"
 #include "SmallPath.h"
 
@@ -99,12 +99,13 @@ int main()
 	string commande;
 	cout << "\tPlus court chemin avec contraintes pour graphe par couche" << endl;
 	cout << "Entrez le nom du fichier contenant les transitions :" << endl;
-	cin >> transitionFile;
+	//cin >> transitionFile;
 	cout << "Entrez le nom du fichier contenant les contraintes :" << endl;
 	//cin >> constraintFile;
 	Automaton<int> myAutomaton = Automaton<int>::Parse("test11.afdC"/*transitionFile*/);
 	Limit limite = Limit::Parse(/*constraintFile*/"test11limite.afdC");
-	SmallPath<int> smPath(myAutomaton);
+	LayeredGraph<int> myLayeredGraph = LayeredGraph<int>(myAutomaton, limite.getWordSize() + 1);
+	SmallPath<int> smPath(myAutomaton, myLayeredGraph);
 	help();
 	while (commande != "quitter") {
 		
@@ -126,7 +127,7 @@ int main()
 			pcc(myAutomaton, limite, smPath);
 		}
 		else if (commande == "afficher") {
-			display(myAutomaton, limite, smPath);
+			//display(myAutomaton, limite, smPath);
 		}
 		else if (commande == "ecrire") {
 			write();
