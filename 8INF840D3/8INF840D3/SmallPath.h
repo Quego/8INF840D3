@@ -62,7 +62,7 @@ inline void SmallPath<T>::calculateDijkstra(Limit limite, std::string word)
 	//Algorithme Dijkstra
 	//initialisation
 	//TODO : Rajouter conditions par rapport aux min Occurences 
-	for (int i = 0; i < m_automaton.getStates().size(); ++i) {
+	for (unsigned int i = 0; i < m_automaton.getStates().size(); ++i) {
 		// Représente l'arbre par couche, non parfait, faire une double liste chainée
 		m_tripleNodeWeightPositionWord.push_back(std::make_tuple((Node<T>*) NULL, INT_MAX, 0));
 	}
@@ -96,7 +96,7 @@ inline void SmallPath<T>::calculateDijkstra(Limit limite, std::string word)
 		}
 
 		//Verification des transitions
-		for (int index = 0; index < currentNode->getTransitions().size(); ++index) {
+		for (unsigned int index = 0; index < currentNode->getTransitions().size(); ++index) {
 			Transition<T>* transition = currentNode->getTransitionAt(index);
 			if (transition->getValue() == word.at(positionWord)-'0') {
 				bool isfinal = false;

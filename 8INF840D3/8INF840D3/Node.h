@@ -28,6 +28,8 @@ public:
 	*/
 	bool isFinal() const;
 
+	void setFinal(bool isFinal);
+
 	/** \brief transtions getter.
 	* \return The transitions of the node.
 	*/
@@ -96,6 +98,12 @@ template<typename T>
 inline bool Node<T>::isFinal() const
 {
 	return m_final;
+}
+
+template<typename T>
+inline void Node<T>::setFinal(bool isFinal)
+{
+	m_final = isFinal;
 }
 
 template<typename T>
