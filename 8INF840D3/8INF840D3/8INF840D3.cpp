@@ -15,7 +15,7 @@ void help()
 	cout << "- graphe : afficher à l'ecran les noeuds" << endl;
 	cout << "- pcc : calculer le plus court chemin" << endl;
 	cout << "- afficher : afficher les plus courts chemins" << endl;
-	cout << "- recherche : recherche arrete" << endl;
+	cout << "- recherche : recherche arete" << endl;
 	cout << "- quitter : quitter le programme" << endl;
 }
 
@@ -104,8 +104,15 @@ void display(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 
 
 //recherche arrete
-void search() {
-
+template <typename T>
+void search(SmallPath<T> smPath, Limit limite) {
+	int first;
+	int second;
+	cout << "Entrez le premier noeud de l'arete recherchee : " << endl;
+	cin >> first;
+	cout << "Entrez le deuxieme noeud de l'arete recherchee : " << endl;
+	cin >> second;
+	smPath.findBetweenNodes(first, second, limite);
 }
 
 
@@ -144,7 +151,7 @@ int main()
 			display(myAutomaton, limite, smPath);
 		}
 		else if (commande == "recherche") {
-			search();
+			search(smPath, limite);
 		}
 	}	
 	EXIT_SUCCESS;
