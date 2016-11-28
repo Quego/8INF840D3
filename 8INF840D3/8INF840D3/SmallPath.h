@@ -23,7 +23,7 @@ public:
 	*/
 	SmallPath(Automaton<T> automaton, LayeredGraph<T> layeredGraph);
 
-	void calculateDijkstra(/*Limit limite,*/ std::string word);
+	void calculateDijkstra(std::string word);
 
 	void relax(Node<T>* currentNode, Node<T>* destinationNode, int weightTransition, int positionWord);
 
@@ -65,7 +65,7 @@ inline SmallPath<T>::SmallPath(Automaton<T> automaton, LayeredGraph<T> layeredGr
  * \brief calculate the smaller path of a word in a graph with Dijkstra Algorithm
  */
 template<typename T>
-inline void SmallPath<T>::calculateDijkstra(/*Limit limite,*/ std::string word)
+inline void SmallPath<T>::calculateDijkstra(std::string word)
 {
 	//Algorithme Dijkstra
 	//initialisation
@@ -74,10 +74,8 @@ inline void SmallPath<T>::calculateDijkstra(/*Limit limite,*/ std::string word)
 	int position = m_automaton.getInitialState().getId() - 1;
 	std::vector<std::vector<std::pair<Node<T>*, int>>> paireNodeWeight = m_layeredGraph.getLayers();
 	std::vector<Node<T>*> V = m_automaton.getStates();
-	std::vector<Node<T>*> S;
 	std::vector<std::pair<Node<T>*,int>> fileNodes;
 	std::vector<Transition<T>*> transitions = m_automaton.getTransitions();
-	//std::vector<Occurrence> occurrences = limite.getOccurrences();
 	fileNodes.push_back(make_pair(m_automaton.getStates().at(position),0));
 
 	while (!fileNodes.empty()) {
@@ -100,7 +98,6 @@ inline void SmallPath<T>::calculateDijkstra(/*Limit limite,*/ std::string word)
 		auto it = std::find(fileNodes.begin(), fileNodes.end(), nodeToRemove);
 		if (it != fileNodes.end()) {
 			fileNodes.erase(it);
-			//S.push_back(currentNode);
 		}
 
 		//Verification des transitions
@@ -124,8 +121,6 @@ inline void SmallPath<T>::calculateDijkstra(/*Limit limite,*/ std::string word)
 				}
 
 				if (positionWord + 1 < word.size() || isfinal ) {					
-					//int currentMaxOccurence = occurrences.at(transition->getValue() - 1).getMax();
-					//if (currentMaxOccurence > 0) {
 						relax(currentNode, transition->getDestination(), transition->getWeight(), positionWord+1);
 						m_displayNode.at(transition->getDestination()->getId()-1).at(positionWord)=currentNode->getId();
 
@@ -133,8 +128,6 @@ inline void SmallPath<T>::calculateDijkstra(/*Limit limite,*/ std::string word)
 						if (!isfinal) {
 							fileNodes.push_back(make_pair(transition->getDestination(), positionWord + 1));
 						}
-						//occurrences.at(transition->getValue() - 1).setMax(currentMaxOccurence - 1);
-					//}
 				}
 				
 			}
@@ -146,9 +139,6 @@ inline void SmallPath<T>::calculateDijkstra(/*Limit limite,*/ std::string word)
 
 	for (Node<T>* finalNode : m_automaton.getFinalStates()) {
 		std::pair<Node<T>*, int> paire = m_layeredGraph.getLayer(word.size()).at(finalNode->getId() - 1);
-		if (paire.first != 0) {
-			cout << "Noeud : " << *paire.first << ", Poids : " << paire.second << ", Position du mot : " << word.size() <<  endl;
-		}
 		if (paire.first != 0 && paire.second < max) {
 			max = paire.second;
 			isFind = true;
@@ -182,9 +172,6 @@ inline void SmallPath<T>::display(std::string word) {
 	int max = INT_MAX;
 	for (Node<T>* finalNode : m_automaton.getFinalStates()) {
 		std::pair<Node<T>*, int> paire = m_layeredGraph.getLayer(word.size()).at(finalNode->getId() - 1);
-		if (paire.first != 0) {
-			cout << "Noeud : " << *paire.first << ", Poids : " << paire.second << ", Position du mot : " << word.size() << endl;
-		}
 		if (paire.first != 0 && paire.second < max) {
 			max = paire.second;
 			finalId = paire.first->getId();
@@ -213,26 +200,18 @@ inline void SmallPath<T>::display(std::string word) {
 template<typename T>
 inline void SmallPath<T>::findBetweenNodes(int first, int second, Limit limite)
 {
-	//Algorithme Dijkstra
 	//initialisation
-	m_layeredGraph.init();
 	m_displayNode = std::vector<std::vector<int>>(m_automaton.getStates().size(), std::vector<int>(limite.getWordSize()));
 	int position = m_automaton.getInitialState().getId() - 1;
 	std::vector<std::vector<std::pair<Node<T>*, int>>> paireNodeWeight = m_layeredGraph.getLayers();
-	std::vector<Node<T>*> V = m_automaton.getStates();
-	std::vector<Node<T>*> S;
-	std::vector<std::pair<Node<T>*, int>> fileNodes;
-	std::vector<Transition<T>*> transitions = m_automaton.getTransitions();
-	std::vector<Occurrence> occurrences = limite.getOccurrences();
-	fileNodes.push_back(make_pair(m_automaton.getStates().at(position), 0));
 	std::vector<std::pair<std::vector<int>,int>> path;
 	std::vector<std::pair<std::vector<int>, int>> pathFinded;
 
 	std::vector<int> singlePath;
 	singlePath.push_back(m_automaton.getInitialState().getId());
 	path.push_back(make_pair(singlePath,0));
-	for (int i = 0; i < m_automaton.getStates().at(m_automaton.getInitialState().getId()-1)->getTransitions().size(); ++i) {
-		Transition<T>* transition = m_automaton.getStates().at(m_automaton.getInitialState().getId() - 1)->getTransitionAt(i);
+	for (int i = 0; i < m_automaton.getStates().at(position)->getTransitions().size(); ++i) {
+		Transition<T>* transition = m_automaton.getStates().at(position)->getTransitionAt(i);
 		std::vector<std::pair<std::vector<int>, int>> pathToFind;
 		pathToFind = recursifParcours(transition->getDestination(), 1, limite.getWordSize(), transition->getWeight(), path);
 		for (std::pair<std::vector<int>, int> mulPath : pathToFind) {
@@ -278,8 +257,6 @@ inline void SmallPath<T>::verify(std::vector<std::pair<std::vector<int>, int>> p
 			reallyTruePath.push_back(mulPath);
 		}
 	}
-
-
 
 	if (!reallyTruePath.empty()) {
 		std::cout << "Parcours : " << std::endl;

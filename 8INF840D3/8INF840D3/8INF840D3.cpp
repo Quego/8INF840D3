@@ -55,7 +55,7 @@ void pcc(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 				}
 			}
 			if (isAlphabetValide) {
-				smPath.calculateDijkstra(/*limite,*/ word);
+				smPath.calculateDijkstra(word);
 			}
 		}
 		else {
@@ -93,7 +93,7 @@ void display(Automaton<T> myAutomaton, Limit limite, SmallPath<T> smPath) {
 			}
 		}
 		if (isAlphabetValide) {
-			smPath.calculateDijkstra(/*limite,*/ word);
+			smPath.calculateDijkstra(word);
 			smPath.display(word);
 		}
 	}
@@ -124,11 +124,11 @@ int main()
 	string commande;
 	cout << "\tPlus court chemin avec contraintes pour graphe par couche" << endl;
 	cout << "Entrez le nom du fichier contenant les transitions :" << endl;
-	//cin >> transitionFile;
+	cin >> transitionFile;
 	cout << "Entrez le nom du fichier contenant les contraintes :" << endl;
-	//cin >> constraintFile;
-	Automaton<int> myAutomaton = Automaton<int>::Parse("test11.afdC"/*transitionFile*/);
-	Limit limite = Limit::Parse(/*constraintFile*/"test11limite.afdC");
+	cin >> constraintFile;
+	Automaton<int> myAutomaton = Automaton<int>::Parse(transitionFile);
+	Limit limite = Limit::Parse(constraintFile);
 	LayeredGraph<int> myLayeredGraph = LayeredGraph<int>(myAutomaton, limite.getWordSize() + 1);
 	SmallPath<int> smPath(myAutomaton, myLayeredGraph);
 	help();
