@@ -41,6 +41,8 @@ public:
 	*/
 	Transition<T>* getTransitionAt(int index);
 
+	Transition<T>* getTransition(int currentId, int destinationId);
+
 	/** \brief Add a transition to the Node
 	* \param destination The destination node.
 	* \param value The value of the Transition.
@@ -116,6 +118,17 @@ template<typename T>
 inline Transition<T>* Node<T>::getTransitionAt(int index)
 {
 	return m_transitions.at(index);
+}
+
+template<typename T>
+inline Transition<T>* Node<T>::getTransition(int currentId, int destinationId)
+{
+	for (Transition<T>* transition : m_transitions) {
+		if (transition->getCurrent()->getId() == currentId && transition->getDestination()->getId() == destinationId) {
+			return transition;
+		}
+	}
+	return nullptr;
 }
 
 template<typename T>

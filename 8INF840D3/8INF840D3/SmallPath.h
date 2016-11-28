@@ -31,7 +31,10 @@ public:
 
 	void findBetweenNodes(int first, int second, Limit limit);
 
-	std::vector<std::vector<int>> recursifParcours(Node<T>* node, int positionWord, int wordSize, std::vector<std::vector<int>> path);
+	void verify(std::vector<std::pair<std::vector<int>, int>> pathFinded, int first, int second, Limit limit);
+
+
+	std::vector<std::pair<std::vector<int>, int>> recursifParcours(Node<T>* node, int positionWord, int wordSize, int weight, std::vector<std::pair<std::vector<int>, int>> path);
 
 private:
 
@@ -222,47 +225,91 @@ inline void SmallPath<T>::findBetweenNodes(int first, int second, Limit limite)
 	std::vector<Transition<T>*> transitions = m_automaton.getTransitions();
 	std::vector<Occurrence> occurrences = limite.getOccurrences();
 	fileNodes.push_back(make_pair(m_automaton.getStates().at(position), 0));
-	std::vector<std::vector<int>> path;
-	std::vector<std::vector<int>> pathFinded;
+	std::vector<std::pair<std::vector<int>,int>> path;
+	std::vector<std::pair<std::vector<int>, int>> pathFinded;
 
 	std::vector<int> singlePath;
 	singlePath.push_back(m_automaton.getInitialState().getId());
-	path.push_back(singlePath);
+	path.push_back(make_pair(singlePath,0));
 	for (int i = 0; i < m_automaton.getStates().at(m_automaton.getInitialState().getId()-1)->getTransitions().size(); ++i) {
 		Transition<T>* transition = m_automaton.getStates().at(m_automaton.getInitialState().getId() - 1)->getTransitionAt(i);
-		std::vector<std::vector<int>> pathToFind;
-		pathToFind = recursifParcours(transition->getDestination(), 1, limite.getWordSize(), path);
-		std::cout << "Parcours : " << m_automaton.getStates().at(m_automaton.getInitialState().getId() - 1)->getTransitions().size() << endl;
-
-		for (std::vector<int> mulPath : pathToFind) {
+		std::vector<std::pair<std::vector<int>, int>> pathToFind;
+		pathToFind = recursifParcours(transition->getDestination(), 1, limite.getWordSize(), transition->getWeight(), path);
+		for (std::pair<std::vector<int>, int> mulPath : pathToFind) {
 			pathFinded.push_back(mulPath);
 		}
 	}
-	std::cout << "Parcours : " << endl;
-	for (std::vector<int> mulPath : pathFinded) {
-		for (int nodeId : mulPath) {
-			std::cout << nodeId << " - ";
+	verify(pathFinded, first, second, limite);
+	
+}
+
+template<typename T>
+inline void SmallPath<T>::verify(std::vector<std::pair<std::vector<int>, int>> pathFinded, int first, int second, Limit limit)
+{
+	std::vector<std::pair<std::vector<int>, int>> truePath;
+	std::vector<std::pair<std::vector<int>, int>> reallyTruePath;
+
+	//Verification de la presence de l'arete
+	for (std::pair<std::vector<int>, int> mulPath : pathFinded) {
+		for (int i = 0; i < mulPath.first.size() - 1; ++i) {
+			if (mulPath.first.at(i) == first && mulPath.first.at(i + 1) == second) {
+				truePath.push_back(mulPath);
+				break;
+			}
 		}
-		std::cout << "\n";
+	}
+
+	//Verification des contraintes sur le chemin
+	for (std::pair<std::vector<int>, int> mulPath : truePath) {
+		std::vector<Occurrence> occurrences = limit.getOccurrences();
+		for (int i = 0; i < mulPath.first.size() - 1; ++i) {
+			Transition<T>* transition = m_automaton.getStates().at(mulPath.first.at(i) - 1)->getTransition(mulPath.first.at(i), mulPath.first.at(i + 1));
+			occurrences.at(transition->getValue() - 1).setMin(occurrences.at(transition->getValue() - 1).getMin() - 1);
+			occurrences.at(transition->getValue() - 1).setMax(occurrences.at(transition->getValue() - 1).getMax() - 1);
+		}
+		bool isAlphabetValide = true;
+		for (int layer = 0; layer < limit.getAlphabetSize(); ++layer) {
+			if (occurrences.at(layer).getMin() > 0 || occurrences.at(layer).getMax() < 0) {
+				isAlphabetValide = false;
+				break;
+			}
+		}
+		if (isAlphabetValide) {
+			reallyTruePath.push_back(mulPath);
+		}
+	}
+
+
+
+	if (!reallyTruePath.empty()) {
+		std::cout << "Parcours : " << std::endl;
+		for (std::pair<std::vector<int>, int> mulPath : reallyTruePath) {
+			for (int nodeId : mulPath.first) {
+				std::cout << nodeId << " - ";
+			}
+			std::cout << "Poids : " << mulPath.second << std::endl;
+		}
+	}
+	else {
+		std::cout << "Le chemin n'est pas trouve" << std::endl;
 	}
 }
 
 template<typename T>
-inline std::vector<std::vector<int>> SmallPath<T>::recursifParcours(Node<T>* node, int positionWord, int wordSize, std::vector<std::vector<int>> path)
+inline std::vector<std::pair<std::vector<int>, int>> SmallPath<T>::recursifParcours(Node<T>* node, int positionWord, int wordSize, int weight, std::vector<std::pair<std::vector<int>, int>> path)
 {
-	std::cout << "positionWord : " << positionWord << endl;
 
-	std::vector < std::vector<int>> pathToReturn;
+	std::vector<std::pair<std::vector<int>, int>> pathToReturn;
 	for (int i=0; i < path.size(); ++i) {
-		path.at(i).push_back(node->getId());
-		std::cout << "Node : " << node->getId() << std::endl;
+		path.at(i).first.push_back(node->getId());
+		path.at(i).second += weight;
 	}
-	if (positionWord < wordSize-1) {
+	if (positionWord < wordSize) {
 		
 		for (Transition<T>* transition : node->getTransitions()) {
-			std::vector<std::vector<int>> pathToFind;
-			pathToFind = recursifParcours(transition->getDestination(), positionWord + 1, wordSize, path);
-			for (std::vector<int> mulPath : pathToFind) {
+			std::vector<std::pair<std::vector<int>, int>> pathToFind;
+			pathToFind = recursifParcours(transition->getDestination(), positionWord + 1, wordSize, transition->getWeight(), path);
+			for (std::pair<std::vector<int>, int> mulPath : pathToFind) {
 				pathToReturn.push_back(mulPath);
 			}
 		}
